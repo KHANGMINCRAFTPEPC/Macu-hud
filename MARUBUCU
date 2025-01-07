@@ -1,0 +1,66 @@
+Icon.Size = UDim2.new(0, 50, 0, 50) -- Kích thước của biểu tượng (50x50 pixel)
+Icon.Position = UDim2.new(0, 10, 0, 10) -- Vị trí ban đầu của biểu tượng (góc trên trái)
+Icon.BackgroundTransparency = 1 -- Không có nền
+
+-- Cho phép kéo biểu tượng
+local draggingIcon = false
+local dragStart
+local startPos
+
+Icon.MouseButton1Down:Connect(function(input)
+    draggingIcon = true
+    dragStart = input.Position
+    startPos = Icon.Position
+
+    input.Changed:Connect(function()
+        if input.UserInputState == Enum.UserInputState.End then
+            draggingIcon = false
+        end
+    end)
+end)
+
+Icon.MouseMoved:Connect(function(x, y)
+    if draggingIcon then
+        local delta = Vector2.new(x, y) - dragStart
+        Icon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Hiển thị hoặc ẩn menu khi bấm vào biểu tượng
+local menuVisible = true
+Icon.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    if menuVisible then
+        Frame:Show()
+    else
+        Frame:Hide()
+    end
+end)
+
+-- Làm cho menu có thể kéo được
+local draggingMenu = false
+local menuDragStart
+local menuStartPos
+
+Frame:MouseEnter() -- Kích hoạt khi chuột vào menu
+Frame.MouseButton1Down:Connect(function(input)
+    draggingMenu = true
+    menuDragStart = input.Position
+    menuStartPos = Frame.Position
+
+    input.Changed:Connect(function()
+        if input.UserInputState == Enum.UserInputState.End then
+            draggingMenu = false
+        end
+    end)
+end)
+
+Frame.MouseMoved:Connect(function(x, y)
+    if draggingMenu then
+        local delta = Vector2.new(x, y) - menuDragStart
+        Frame.Position = UDim2.new(menuStartPos.X.Scale, menuStartPos.X.Offset + delta.X, menuStartPos.Y.Scale, menuStartPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Thông báo hoàn tất
+Library:Notify("Macu HUD đã được kích hoạt với biểu tượng!", 5)
