@@ -1,3 +1,51 @@
+-- Kiểm tra xem trò chơi có phải là Blox Fruits không
+if not (game.PlaceId == 7449423635 or game.PlaceId == 2753915549 or game.PlaceId == 4442272183) then
+    warn("Script này chỉ dành cho Blox Fruits!")
+    return
+end
+
+-- Tạo giao diện UI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Macu HUD", "DarkTheme")
+
+-- Tab chính
+local MainTab = Window:NewTab("Main")
+local FarmSection = MainTab:NewSection("Farm")
+local TeleportSection = MainTab:NewSection("Dịch Chuyển")
+
+-- Thêm mục Farm (để trống)
+FarmSection:NewLabel("Chức năng Farm đang để trống!")
+
+-- Dữ liệu quái trong Blox Fruits
+local Mobs = {
+    ["Bandit"] = CFrame.new(1060, 16, 1536),
+    ["Monkey"] = CFrame.new(-1442, 38, -252),
+    ["Gorilla"] = CFrame.new(-1230, 6, -503),
+    ["Pirate"] = CFrame.new(-1162, 6, 3944),
+    ["Brute"] = CFrame.new(-1184, 40, 4363)
+    -- Thêm các quái khác tại đây
+}
+
+-- Chức năng Dịch Chuyển
+TeleportSection:NewDropdown("Chọn Quái để Dịch Chuyển", "Bay đến vị trí của quái", table.concat(table.keys(Mobs), ","), function(selectedMob)
+    local player = game.Players.LocalPlayer
+    local char = player.Character or player.CharacterAdded:Wait()
+    if Mobs[selectedMob] then
+        char.HumanoidRootPart.CFrame = Mobs[selectedMob]
+    else
+        warn("Không tìm thấy quái được chọn!")
+    end
+end)
+
+-- Tạo biểu tượng bật/tắt menu
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Icon = Instance.new("ImageButton", ScreenGui)
+local Frame = Window:CreateUI("Macu HUD", "DarkTheme")
+
+-- Thiết lập biểu tượng
+Icon.Name = "MacuHUDIcon"
+Icon.Image = "rbxassetid://1234567890" -- Thay bằng ID hình ảnh bạn muốn
+Icon.Size = UDim2.new(0)
 Icon.Size = UDim2.new(0, 50, 0, 50) -- Kích thước của biểu tượng (50x50 pixel)
 Icon.Position = UDim2.new(0, 10, 0, 10) -- Vị trí ban đầu của biểu tượng (góc trên trái)
 Icon.BackgroundTransparency = 1 -- Không có nền
@@ -64,69 +112,4 @@ end)
 
 -- Thông báo hoàn tất
 Library:Notify("Macu HUD đã được kích hoạt với biểu tượng!", 5)
-Icon.Size = UDim2.new(0, 50, 0, 50) -- Kích thước của biểu tượng (50x50 pixel)
-Icon.Position = UDim2.new(0, 10, 0, 10) -- Vị trí ban đầu của biểu tượng (góc trên trái)
-Icon.BackgroundTransparency = 1 -- Không có nền
 
--- Cho phép kéo biểu tượng
-local draggingIcon = false
-local dragStart
-local startPos
-
-Icon.MouseButton1Down:Connect(function(input)
-    draggingIcon = true
-    dragStart = input.Position
-    startPos = Icon.Position
-
-    input.Changed:Connect(function()
-        if input.UserInputState == Enum.UserInputState.End then
-            draggingIcon = false
-        end
-    end)
-end)
-
-Icon.MouseMoved:Connect(function(x, y)
-    if draggingIcon then
-        local delta = Vector2.new(x, y) - dragStart
-        Icon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
--- Hiển thị hoặc ẩn menu khi bấm vào biểu tượng
-local menuVisible = true
-Icon.MouseButton1Click:Connect(function()
-    menuVisible = not menuVisible
-    if menuVisible then
-        Frame:Show()
-    else
-        Frame:Hide()
-    end
-end)
-
--- Làm cho menu có thể kéo được
-local draggingMenu = false
-local menuDragStart
-local menuStartPos
-
-Frame:MouseEnter() -- Kích hoạt khi chuột vào menu
-Frame.MouseButton1Down:Connect(function(input)
-    draggingMenu = true
-    menuDragStart = input.Position
-    menuStartPos = Frame.Position
-
-    input.Changed:Connect(function()
-        if input.UserInputState == Enum.UserInputState.End then
-            draggingMenu = false
-        end
-    end)
-end)
-
-Frame.MouseMoved:Connect(function(x, y)
-    if draggingMenu then
-        local delta = Vector2.new(x, y) - menuDragStart
-        Frame.Position = UDim2.new(menuStartPos.X.Scale, menuStartPos.X.Offset + delta.X, menuStartPos.Y.Scale, menuStartPos.Y.Offset + delta.Y)
-    end
-end)
-
--- Thông báo hoàn tất
-Library:Notify("Macu HUD đã được kích hoạt với biểu tượng!", 5)
